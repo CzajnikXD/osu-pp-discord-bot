@@ -1,6 +1,6 @@
 <p align="center">
   <img src="https://imgur.com/mW5xuP6.png" alt="External image">
-</p>
+</p>\
 # **Simple osu discord bot**
 ## **Implemented Functionality**
 - Calculation of performance points for Osu! Standard mode (Both Stable and Lazer builds)
@@ -10,9 +10,7 @@
 ## **Setup**
 To run the bot yourself you need to:
 - Provide all of .env variables:
-```
-- DISCORD_TOKEN 
-- CLIENT_ID
-- CLIENT_SECTER
-```
+  - DISCORD_TOKEN 
+  - CLIENT_ID
+  - CLIENT_SECRET
 - Install all dependencies from requirements.txt

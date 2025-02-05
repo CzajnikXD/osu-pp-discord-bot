@@ -67,8 +67,6 @@ def calc_lazer_pp(map, acc, n300, n100, n50, misses, combo, mods, large_tick_hit
     perf.set_large_tick_hits(max_slider_tick)
     max_performance = perf.calculate(beatmap)
 
-    print(max_n300, max_objects,slider_end_hits, large_tick_hits)
-
     full_combo = max_performance.difficulty.max_combo
     final_pp = format(max_performance.pp, ".2f")
     stars = format(max_performance.difficulty.stars, ".2f")

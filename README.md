@@ -12,8 +12,8 @@ This bot is a project I started because the old osu! Discord bot I was using beg
 
 ## **Setup**
 To run the bot yourself you need to:
-- Provide all of .env variables:
-  - DISCORD_TOKEN 
-  - CLIENT_ID
-  - CLIENT_SECRET
-- Install all dependencies from requirements.txt
+- Provide all of `.env` variables:
+  - `DISCORD_TOKEN`
+  - `CLIENT_ID`
+  - `CLIENT_SECRET`
+- Install all dependencies from `requirements.txt`

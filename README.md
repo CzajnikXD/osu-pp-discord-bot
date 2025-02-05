@@ -7,7 +7,7 @@ This bot is a project I started because the old osu! Discord bot I was using beg
 
 ## **Implemented Functionality**
 - Calculates performance points for osu! Standard mode (compatible with both Stable and Lazer builds).
-- Downloads beatmapsets used by players locally and sorts them by usage (default map storage limit is 5GB, which can be changed in the code).
+- Downloads beatmapsets used by players locally and sorts them by usage. If the map storage exceeds the limit (default 5GB, configurable in the code), the bot automatically deletes the least-used beatmapset to free up space.
 - Stores osu! usernames and their preferred osu! build locally, and calculates pp based on this information.
 
 ## **Setup**

@@ -16,6 +16,6 @@ To run the bot yourself you need to:
   - `DISCORD_TOKEN`
   - `CLIENT_ID`
   - `CLIENT_SECRET`
-- Install all dependencies from `requirements.txt`\
+- Install all dependencies from `requirements.txt`
 
 Bot was written and tested in `Pycharm Professional 2022.3.2`

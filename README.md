@@ -1,7 +1,9 @@
 <p align="center">
   <img src="https://imgur.com/mW5xuP6.png" alt="External image">
-</p>\
+</p>
+
 # **Simple osu discord bot**
+
 ## **Implemented Functionality**
 - Calculation of performance points for Osu! Standard mode (Both Stable and Lazer builds)
 - Bot downloads beatmapsets used by players locally and sorts them by usage (Default map storage limit is 5GB, can be changed in code)

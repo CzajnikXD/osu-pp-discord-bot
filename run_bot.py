@@ -333,7 +333,6 @@ async def rs(ctx):
 
     try:
         map_data = await get_map_data(osu_user_id, user, playmode, 0, lazer, on_download_start, on_download_fail)
-
         # Create the embed
         embed = discord.Embed(
             title="",
@@ -347,7 +346,6 @@ async def rs(ctx):
         embed.set_footer(text=f"{map_data[0]['server']}  •  {date.today()}", icon_url=map_data[0]['image_osu_url'])
         embed.set_thumbnail(url=map_data[0]['image_url'])
     except:
-        result = False
         return
 
     # Create navigation buttons

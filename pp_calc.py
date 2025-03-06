@@ -181,7 +181,6 @@ async def map_download(beatmap, on_download_start=None, on_download_fail=None):
         manager.add_beatmap(beatmap[0])
         if on_download_start:
             await on_download_start()
-
         try:
             resp = requests.get(f'https://beatconnect.io/b/{beatmap[0]}', timeout=10)
             resp.raise_for_status()

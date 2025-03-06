@@ -123,7 +123,7 @@ async def getplaymode(ctx):
     else:
         await ctx.send(f"**You didn't set your prefered playmode yet**")
 
-async def get_map_data(osu_user_id, user, playmode, position, lazer, on_download_start):
+async def get_map_data(osu_user_id, user, playmode, position, lazer, on_download_start, on_download_fail):
     """
     Retrieves data for the most recent osu play for the specified user.
     """
@@ -135,11 +135,15 @@ async def get_map_data(osu_user_id, user, playmode, position, lazer, on_download
     beatmap = pp.get_beatmap(recent[0], position)
 
     full_title = f'{beatmap[2]} [{beatmap[1]}]'
-    beatmap_file = await pp.map_download(beatmap, on_download_start)
-    calc_result = pp.calc_lazer_pp(
-        beatmap_file, score[0], score[1], score[2], score[3], score[4], score[5],
-        score[6], score[9], score[10], score[11], lazer
-    )
+    beatmap_file = await pp.map_download(beatmap, on_download_start, on_download_fail)
+    try:
+        calc_result = pp.calc_lazer_pp(
+            beatmap_file, score[0], score[1], score[2], score[3], score[4], score[5],
+            score[6], score[9], score[10], score[11], lazer
+        )
+    except:
+        return
+
     accuracy = format(score[0] * 100, ".2f")
     n300 = score[1] or 0
     n100 = score[2] or 0
@@ -167,6 +171,9 @@ async def rs(ctx):
 
     async def on_download_start():
         await ctx.send("**Map seen for the first time, please wait**")
+
+    async def on_download_fail():
+        await ctx.send("**There has been an unknown error while downloading the map**")
 
     async def on_input_submit(interaction: discord.Interaction, value):
         current_position[0] = value
@@ -254,12 +261,15 @@ async def rs(ctx):
         """
         Updates the embed with the data for the current position.
         """
-        map_data = await get_map_data(osu_user_id, user, playmode, current_position[0] - 1, lazer, on_download_start)
-        if not map_data:
-            if not interaction.response.is_done():
-                await interaction.response.send_message("**Invalid position. No data available.**", ephemeral=True)
-            else:
-                await interaction.followup.send("**Invalid position. No data available.**", ephemeral=True)
+        try:
+            map_data = await get_map_data(osu_user_id, user, playmode, current_position[0] - 1, lazer, on_download_start, on_download_fail)
+            if not map_data:
+                if not interaction.response.is_done():
+                    await interaction.response.send_message("**Invalid position. No data available.**", ephemeral=True)
+                else:
+                    await interaction.followup.send("**Invalid position. No data available.**", ephemeral=True)
+                return
+        except:
             return
 
         embed = discord.Embed(
@@ -321,23 +331,24 @@ async def rs(ctx):
     else:
         lazer = True
 
-    map_data = await get_map_data(osu_user_id, user, playmode, 0, lazer, on_download_start)
-    if not map_data:
-        await ctx.send("**Recent plays not found, please try playing a map before using a command again**")
-        return
+    try:
+        map_data = await get_map_data(osu_user_id, user, playmode, 0, lazer, on_download_start, on_download_fail)
 
-    # Create the embed
-    embed = discord.Embed(
-        title="",
-        color=discord.Color.blue()
-    )
-    embed.set_author(name=map_data[0]['map'], icon_url=map_data[0]['user_url'])
-    embed.description = (
-        f"{map_data[0]['result']}\n"
-        f"{map_data[0]['score_details']}"
-    )
-    embed.set_footer(text=f"{map_data[0]['server']}  •  {date.today()}", icon_url=map_data[0]['image_osu_url'])
-    embed.set_thumbnail(url=map_data[0]['image_url'])
+        # Create the embed
+        embed = discord.Embed(
+            title="",
+            color=discord.Color.blue()
+        )
+        embed.set_author(name=map_data[0]['map'], icon_url=map_data[0]['user_url'])
+        embed.description = (
+            f"{map_data[0]['result']}\n"
+            f"{map_data[0]['score_details']}"
+        )
+        embed.set_footer(text=f"{map_data[0]['server']}  •  {date.today()}", icon_url=map_data[0]['image_osu_url'])
+        embed.set_thumbnail(url=map_data[0]['image_url'])
+    except:
+        result = False
+        return
 
     # Create navigation buttons
     button_max_left = Button(label="◂◂", style=discord.ButtonStyle.secondary)

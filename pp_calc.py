@@ -159,7 +159,7 @@ def get_recent_score(recent, limit_number):
     miss = statistics.miss
     return accuracy, n300, n100, n50, miss, max_combo, mods, grade.value, pp, large_tick_hits, slider_end_hits, large_tick_miss
 
-async def map_download(beatmap, on_download_start=None):
+async def map_download(beatmap, on_download_start=None, on_download_fail=None):
     """
     Downloads the specified beatmap and extracts the required files.
     """
@@ -181,9 +181,17 @@ async def map_download(beatmap, on_download_start=None):
         manager.add_beatmap(beatmap[0])
         if on_download_start:
             await on_download_start()
-        resp = requests.get(f'https://beatconnect.io/b/{beatmap[0]}')
+
+        try:
+            resp = requests.get(f'https://beatconnect.io/b/{beatmap[0]}', timeout=10)
+            resp.raise_for_status()
+        except (requests.Timeout, requests.ConnectionError, requests.HTTPError) as e:
+            if on_download_fail:
+                await on_download_fail()
+            return
+
         with open(path, 'wb') as f:
-            for buff in resp:
+            for buff in resp.iter_content(chunk_size=8192):
                 f.write(buff)
 
     search_text = f'[{beatmap[1]}]'

@@ -5,6 +5,7 @@ import requests
 import os
 import zipfile
 from dotenv import load_dotenv
+from tqdm import tqdm
 
 # Load environment variables from a .env file
 load_dotenv()
@@ -176,22 +177,44 @@ async def map_download(beatmap, on_download_start=None, on_download_fail=None):
     main_path = os.path.dirname(os.path.abspath(__file__))
     folder_path = os.path.join(main_path, "mapfolder")
     path = manager.get_file_path(beatmap[0])
+    temp_path = path + ".part"
+
+    if os.path.exists(temp_path):
+        os.remove(temp_path)
 
     if not os.path.exists(path):
         manager.add_beatmap(beatmap[0])
         if on_download_start:
             await on_download_start()
+
+        url = f'https://beatconnect.io/b/{beatmap[0]}'
+
         try:
-            resp = requests.get(f'https://beatconnect.io/b/{beatmap[0]}', timeout=10)
-            resp.raise_for_status()
-        except (requests.Timeout, requests.ConnectionError, requests.HTTPError) as e:
+            with requests.get(url, stream=True, timeout=10) as resp:
+                resp.raise_for_status()
+                total_size = int(resp.headers.get('content-length', 0))
+                chunk_size = 8192
+
+                with open(temp_path, 'wb') as f, tqdm(
+                        desc="Downloading",
+                        total=total_size,
+                        unit="B",
+                        unit_scale=True,
+                        unit_divisor=1024
+                ) as bar:
+                    for buff in resp.iter_content(chunk_size=chunk_size):
+                        f.write(buff)
+                        bar.update(len(buff))
+
+            os.rename(temp_path, path)
+
+        except (requests.Timeout, requests.ConnectionError, requests.HTTPError):
             if on_download_fail:
                 await on_download_fail()
             return
-
-        with open(path, 'wb') as f:
-            for buff in resp.iter_content(chunk_size=8192):
-                f.write(buff)
+        finally:
+            if os.path.exists(temp_path):
+                os.remove(temp_path)
 
     search_text = f'[{beatmap[1]}]'
     with zipfile.ZipFile(path, 'r') as zip_ref:
